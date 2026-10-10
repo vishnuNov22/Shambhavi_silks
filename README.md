@@ -18,15 +18,27 @@ Deploy: push to GitHub → import into Vercel (zero config).
 |---|---|
 | Business info (phone, WhatsApp, address, Instagram) | `data/site.ts` |
 | **74 products**, categories, collections, story imagery | `data/products.ts` |
-| WebGL silk cloth (PBR `MeshPhysicalMaterial` + vertex-displacement shader, woven zari border & butta motifs, PMREM studio lighting, pointer camera parallax) | `components/three/SilkCloth.tsx` |
-| Shader image-dissolve (noise "thread" field + molten-zari seam) | `components/three/ImageMorph.tsx` |
-| Homepage hero + 7 scroll scenes | `components/home/*` |
-| Header / mega-menu / search (`/` or ⌘K) / cart drawer / quick view / cursor | `components/layout/*` |
-| Shop, filters, product cards, PDP, cart, wishlist, contact form | `components/shop/*` |
+| Hero slider: brush-stroke SVG reveals, rolling counters, 3D rose-gold satin ribbons that knot between slides | `components/home/HeroSlider.tsx`, `components/three/RibbonKnot.tsx` |
+| Rose petals drifting over the whole site (instanced WebGL, click-through) | `components/three/Petals.tsx` |
+| Golden orbit rings, hanging brocade, bursting brocade pieces, faceted gems | `components/three/Scenes.tsx`, `FabricMesh.tsx` |
+| Homepage scenes | `components/home/*` |
+| Minimal header, full-screen menu, optional ambient sound | `components/layout/*` |
+| Product cards + card → product shared-element transition | `components/shop/ProductCard.tsx` |
+| Shop, filters, PDP, cart, wishlist, contact form | `components/shop/*` |
 | Styles (design tokens → components) | `styles/*.css` |
 
-### Homepage film
-Hero (arch → full-bleed expansion) → 01 The Art of Silk (live WebGL silk window opens, motifs surface) → 02 From Thread to Masterpiece (pinned shader dissolves) → 03 The Saree Experience (from darkness → border detail) → 04 Bridal Couture → 05 Designer Lehengas (horizontal pinned rail) → 06 The Collection (shoppable grid with in-place filtering) → 07 Visit Shambhavi (curtain reveal).
+### Homepage (v3 — after the client's reference video)
+Palette: wine `#3A0F17`, noir `#0F0B0C`, rose-gold `#C98F78`, champagne gold `#D9B77C`, ivory `#F4ECE2`, petal `#EFC3C0`.
+
+1. **Hero slider** — each look is painted in through rough brush strokes over gold silk; a counter rolls up; two 3D satin ribbons sweep in, tie a knot and pull away between slides. Autoplay, dashes, swipe.
+2. **The Edit** — "SHAMBHAVI" masthead; numbered cards float in 3D depth and the camera flies through them on scroll.
+3. **Golden Orbit** — luminous rings orbit the bridal look (passing behind and in front), the name huge behind.
+4. **The Making** — headline written by scroll, real brocade hanging and swaying in 3D, a circular lens opens onto the weave.
+5. **Craftsmanship** — brocade pieces burst apart in 3D with labelled leader lines that track each piece.
+6. **The House Line** — the boutique's own tagline, floating gold/onyx gems, drifting tags, contact chips.
+7. **The Collection** — editorial grid with category tabs.
+
+Cut-out (transparent-background) product photos would let garments float exactly like the reference; drop PNGs into `public/products/` and point the slide/product image ids at them.
 
 ### Pages
 `/` · `/shop` (search, category/price/colour filters, sort, URL-synced) · `/collections/[sarees|lehengas|bridal|anarkali|occasion]` · `/product/[slug]` (gallery, hover zoom, full-screen viewer, options, qty, WhatsApp enquiry, related + recently viewed, JSON-LD) · `/cart` · `/wishlist` · `/our-story` · `/contact`

@@ -1,28 +1,28 @@
-import Hero from "@/components/home/Hero";
-import SceneSilk from "@/components/home/SceneSilk";
-import SceneThread from "@/components/home/SceneThread";
-import SceneSaree from "@/components/home/SceneSaree";
-import SceneBridal from "@/components/home/SceneBridal";
-import SceneLehenga from "@/components/home/SceneLehenga";
+import HeroSlider from "@/components/home/HeroSlider";
+import SceneEdit from "@/components/home/SceneEdit";
+import SceneOrbit from "@/components/home/SceneOrbit";
+import SceneMaking from "@/components/home/SceneMaking";
+import SceneCraftsmanship from "@/components/home/SceneCraftsmanship";
+import SceneQuote from "@/components/home/SceneQuote";
 import SceneCollection from "@/components/home/SceneCollection";
-import SceneVisit from "@/components/home/SceneVisit";
 
 /**
- * Home — one continuous film in seven scenes:
- * Hero → Art of Silk → Thread to Masterpiece → The Saree → Bridal Couture →
- * Designer Lehengas → The Collection (shopping) → Visit Shambhavi.
+ * Home (v3) — after the client's reference film:
+ * Hero slider (brush reveals + 3D silk-ribbon knot) → The Edit (3D magazine
+ * cards) → Golden Orbit (bridal) → The Making (hanging brocade, lens) →
+ * Craftsmanship (bursting brocades + callouts) → The House Line (gems, tags)
+ * → The Collection.
  */
 export default function HomePage() {
   return (
     <>
-      <Hero />
-      <SceneSilk />
-      <SceneThread />
-      <SceneSaree />
-      <SceneBridal />
-      <SceneLehenga />
+      <HeroSlider />
+      <SceneEdit />
+      <SceneOrbit />
+      <SceneMaking />
+      <SceneCraftsmanship />
+      <SceneQuote />
       <SceneCollection />
-      <SceneVisit />
     </>
   );
 }

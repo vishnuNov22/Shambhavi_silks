@@ -3,12 +3,10 @@ import Link from "next/link";
 import { MapPin, Phone } from "lucide-react";
 import { CATEGORIES } from "@/data/products";
 import { SITE, whatsappLink } from "@/data/site";
-import { TempleBorder } from "@/components/ui/Motif";
 
 export default function Footer() {
   return (
     <footer className="footer">
-      <TempleBorder className="footer__border" />
       <div className="footer__grid">
         <div className="footer__brand">
           <p className="footer__word">Shambhavi</p>

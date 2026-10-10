@@ -2,28 +2,31 @@
 
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
-import { ArrowRight } from "lucide-react";
 import ProductCard from "@/components/shop/ProductCard";
-import Img from "@/components/ui/Img";
 import LuxButton from "@/components/ui/LuxButton";
-import Marquee from "@/components/ui/Marquee";
 import SplitReveal from "@/components/ui/SplitReveal";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { CATEGORIES, PRODUCTS, type CategorySlug } from "@/data/products";
+import { PRODUCTS, type CategorySlug } from "@/data/products";
 
-const TABS: { label: string; cats: CategorySlug[] | null }[] = [
-  { label: "All", cats: null },
-  { label: "Silk Sarees", cats: ["silk-sarees"] },
-  { label: "Designer", cats: ["designer-sarees", "occasion-wear"] },
-  { label: "Bridal", cats: ["bridal-sarees", "bridal-collections"] },
-  { label: "Lehengas", cats: ["designer-lehengas", "tops-and-skirts"] },
-  { label: "Anarkali", cats: ["anarkali-gowns"] },
+const TABS: { label: string; cats: CategorySlug[] | null; href: string }[] = [
+  { label: "All", cats: null, href: "/shop" },
+  { label: "Silk Sarees", cats: ["silk-sarees"], href: "/shop?cat=silk-sarees" },
+  { label: "Designer Sarees", cats: ["designer-sarees", "occasion-wear"], href: "/collections/sarees" },
+  { label: "Lehengas", cats: ["designer-lehengas", "tops-and-skirts"], href: "/collections/lehengas" },
+  { label: "Bridal", cats: ["bridal-sarees", "bridal-collections"], href: "/collections/bridal" },
+  { label: "Anarkali", cats: ["anarkali-gowns"], href: "/collections/anarkali" },
+];
+
+/** Hand-picked opening edit for the "All" view. */
+const EDIT = [
+  "peacock-green-kanchipuram-silk", "maroon-zardozi-lehenga", "rose-and-ruby-designer-saree", "sindoor-red-bridal-silk-saree",
+  "pearl-white-flared-anarkali", "royal-navy-butta-silk-saree", "emerald-cascade-lehenga", "the-rajkumari-bridal-look", "sage-tissue-designer-saree",
 ];
 
 /**
- * SCENE 06 — The Collection.
- * Motion steps back here: an ivory, comfortable browsing surface with
- * category tabs that re-flow the grid in place (no page interruption).
+ * SCENE 5 — The Collection Gallery.
+ * Motion steps back: warm ivory, an asymmetric editorial grid (one hero piece
+ * + eight), and category tabs that re-flow the grid in place.
  */
 export default function SceneCollection() {
   const root = useRef<HTMLElement>(null);
@@ -32,21 +35,22 @@ export default function SceneCollection() {
 
   const list = useMemo(() => {
     const cats = TABS[tab].cats;
-    const pool = cats ? PRODUCTS.filter((p) => cats.includes(p.category)) : PRODUCTS.filter((_, i) => i % 3 === 0);
-    return pool.slice(0, 8);
+    if (!cats) return EDIT.map((s) => PRODUCTS.find((p) => p.slug === s)).filter((p): p is (typeof PRODUCTS)[number] => !!p);
+    return PRODUCTS.filter((p) => cats.includes(p.category)).slice(0, 9);
   }, [tab]);
+  const total = TABS[tab].cats ? PRODUCTS.filter((p) => TABS[tab].cats!.includes(p.category)).length : PRODUCTS.length;
 
   const choose = (i: number) => {
     if (i === tab) return;
     const cards = grid.current?.querySelectorAll(".card");
     if (!cards || window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setTab(i); return; }
     gsap.to(cards, {
-      opacity: 0, y: 30, duration: 0.3, stagger: 0.02, ease: "power2.in",
+      autoAlpha: 0, y: 24, duration: 0.35, stagger: 0.02, ease: "power2.in",
       onComplete: () => {
         setTab(i);
         requestAnimationFrame(() => {
           const next = grid.current?.querySelectorAll(".card");
-          if (next) gsap.fromTo(next, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.05, ease: "expo.out" });
+          if (next) gsap.fromTo(next, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.05, ease: "expo.out" });
         });
       },
     });
@@ -55,37 +59,25 @@ export default function SceneCollection() {
   useGSAP(
     () => {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      gsap.from(".coll__cat", {
-        y: 80, opacity: 0, stagger: 0.07, duration: 1.2, ease: "expo.out",
-        scrollTrigger: { trigger: ".coll__cats", start: "top 85%", once: true },
+      gsap.fromTo(".gallery .card", { y: 70, autoAlpha: 0 }, {
+        y: 0, autoAlpha: 1, stagger: 0.07, duration: 1.3, ease: "expo.out",
+        scrollTrigger: { trigger: ".gallery", start: "top 85%", once: true },
       });
-      gsap.from(".coll__grid .card", {
-        y: 60, opacity: 0, stagger: 0.06, duration: 1.1, ease: "expo.out",
-        scrollTrigger: { trigger: ".coll__grid", start: "top 85%", once: true },
-      });
+      gsap.fromTo(".coll__rule", { scaleX: 0 }, { scaleX: 1, duration: 1.6, ease: "power3.inOut", scrollTrigger: { trigger: ".coll__head", start: "top 80%", once: true } });
     },
     { scope: root }
   );
 
   return (
     <section ref={root} className="coll" id="collection" aria-labelledby="coll-title">
-      <Marquee items={["Silk Sarees", "Designer Lehengas", "Bridal Couture", "Anarkali Gowns", "Handlooms", "Occasion Wear"]} />
-      <div className="coll__head container">
-        <p className="eyebrow">Scene 06 · The Collection</p>
-        <SplitReveal as="h2" text="Find your drape" className="coll__title" mode="chars" />
-        <p className="coll__lead">{PRODUCTS.length} pieces across sarees, lehengas, Anarkalis and bridal couture. Reserve any piece on WhatsApp or add it to your bag.</p>
-      </div>
-
-      <div className="coll__cats container">
-        {CATEGORIES.filter((c) => PRODUCTS.some((p) => p.category === c.slug)).slice(0, 6).map((c) => (
-          <Link key={c.slug} href={`/shop?cat=${c.slug}`} className="coll__cat" data-cursor-label="Shop">
-            <span className="coll__cat-img"><Img id={c.cover} alt="" ratio={1.25} width={500} sizes="(max-width: 820px) 33vw, 15vw" /></span>
-            <span className="coll__cat-name">{c.name}</span>
-          </Link>
-        ))}
-      </div>
-
       <div className="container">
+        <div className="coll__head">
+          <p className="kicker kicker--dark">The Collection</p>
+          <SplitReveal as="h2" text="Pieces to be kept" className="coll__title" mode="chars" />
+          <span className="coll__rule" aria-hidden="true" />
+          <p className="coll__lead">Silk and designer sarees, lehengas, Anarkalis and bridal couture — {PRODUCTS.length} pieces, each one viewable at the boutique.</p>
+        </div>
+
         <div className="tabs" role="tablist" aria-label="Filter the collection">
           {TABS.map((t, i) => (
             <button key={t.label} role="tab" aria-selected={i === tab} className={`tab ${i === tab ? "is-active" : ""}`} onClick={() => choose(i)} data-cursor="hover">
@@ -93,12 +85,15 @@ export default function SceneCollection() {
             </button>
           ))}
         </div>
-        <div className="grid coll__grid" ref={grid} role="tabpanel" aria-live="polite">
-          {list.map((p, i) => <ProductCard key={p.id} p={p} index={i} />)}
+
+        <div className="gallery" ref={grid} role="tabpanel" aria-live="polite">
+          {list.map((p, i) => <ProductCard key={p.id} p={p} index={i} size={i === 0 ? "lg" : "md"} />)}
         </div>
+
         <div className="coll__foot">
-          <LuxButton href="/shop">Shop all {PRODUCTS.length} pieces</LuxButton>
-          <Link href="/wishlist" className="text-link">Your wishlist <ArrowRight size={14} /></Link>
+          <LuxButton href={TABS[tab].href} variant="solid">{tab === 0 ? "View the Collection" : `Shop all ${TABS[tab].label}`}</LuxButton>
+          <p className="coll__count">{total} pieces</p>
+          <Link href="/wishlist" className="text-link">Your wishlist</Link>
         </div>
       </div>
     </section>

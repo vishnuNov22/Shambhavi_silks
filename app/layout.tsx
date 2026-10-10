@@ -13,6 +13,7 @@ import SearchOverlay from "@/components/layout/SearchOverlay";
 import QuickView from "@/components/layout/QuickView";
 import Cursor from "@/components/layout/Cursor";
 import Toast from "@/components/layout/Toast";
+import PetalsLayer from "@/components/layout/PetalsLayer";
 import { SITE } from "@/data/site";
 
 const serif = Cormorant_Garamond({
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d0b0a",
+  themeColor: "#160e10",
   width: "device-width",
   initialScale: 1,
 };
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SearchOverlay />
           <QuickView />
           <Toast />
+          <PetalsLayer />
           <Cursor />
         </StoreProvider>
       </body>

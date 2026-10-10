@@ -51,7 +51,10 @@ export default function ProductDetail({ slug }: { slug: string }) {
     () => {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       gsap.from(".pdp__info > *:not(.pdp__title)", { y: 30, opacity: 0, stagger: 0.06, duration: 1, ease: "expo.out", delay: 0.6 });
-      gsap.from(".pdp__main", { clipPath: "inset(0 0 100% 0)", duration: 1.4, ease: "expo.inOut", delay: 0.3 });
+      // When arriving via a card, the photograph itself flies in (View Transition) — no extra reveal.
+      if (!document.documentElement.classList.contains("vt-nav")) {
+        gsap.from(".pdp__main", { clipPath: "inset(0 0 100% 0)", duration: 1.4, ease: "expo.inOut", delay: 0.3 });
+      }
     },
     { scope: root, dependencies: [p.id] }
   );
@@ -89,7 +92,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
                 </button>
               ))}
             </div>
-            <div className="pdp__main">
+            <div className="pdp__main" data-vt-hero data-vt-slug={p.slug} style={{ viewTransitionName: "pdp-hero" } as React.CSSProperties}>
               <ZoomImage id={p.images[active]} alt={`${p.name} — ${VIEW_LABELS[active] ?? "view"}`} ratio={1.3} onOpen={() => setLightbox(true)} priority />
               <div className="pdp__nav">
                 <button onClick={() => go(-1)} aria-label="Previous image"><ChevronLeft size={18} /></button>
@@ -145,7 +148,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
                   <dl className="specs">
                     <div><dt>Product code</dt><dd>{p.id}</dd></div>
                     <div><dt>Category</dt><dd>{cat?.name}</dd></div>
-                    <div><dt>Fabric</dt><dd>{p.fabric}</dd></div>
+                    <div><dt>Fabric</dt><dd>{p.fabric} <small>(to be confirmed)</small></dd></div>
                     <div><dt>Occasion</dt><dd>{p.occasion}</dd></div>
                     <div><dt>Colour</dt><dd>{p.color}</dd></div>
                   </dl>

@@ -69,15 +69,15 @@ export type Product = {
 type Seed = [image: string, name: string, color: string, hex: string, price: number, extra?: Partial<Product>];
 
 const FABRIC: Record<CategorySlug, string> = {
-  "silk-sarees": "Silk with woven zari (demo — confirm with boutique)",
-  "designer-sarees": "Designer blend (demo — confirm with boutique)",
-  "bridal-sarees": "Silk with zari work (demo — confirm with boutique)",
-  "designer-lehengas": "Embroidered lehenga set (demo — confirm with boutique)",
-  "anarkali-gowns": "Embroidered georgette (demo — confirm with boutique)",
-  "bridal-collections": "Bridal ensemble (demo — confirm with boutique)",
-  "salwar-suits": "Suit set (demo — confirm with boutique)",
-  "tops-and-skirts": "Coordinated set (demo — confirm with boutique)",
-  "occasion-wear": "Festive wear (demo — confirm with boutique)",
+  "silk-sarees": "Silk with woven zari",
+  "designer-sarees": "Designer blend",
+  "bridal-sarees": "Silk with zari work",
+  "designer-lehengas": "Embroidered lehenga set",
+  "anarkali-gowns": "Embroidered georgette",
+  "bridal-collections": "Bridal ensemble",
+  "salwar-suits": "Suit set",
+  "tops-and-skirts": "Coordinated set",
+  "occasion-wear": "Festive wear",
 };
 
 const OCCASION: Record<CategorySlug, string> = {
@@ -291,4 +291,16 @@ export const STORY = {
   sareeHero: "1610030469983-98e550d6193c",
   bridal: ["1684868268327-7e5590bcfbd6", "1600685890506-593fdf55949b", "1610173827043-9db50e0d8ef9"],
   boutique: "1612273882633-9416493e1914",
+  // v3 (reference-video direction)
+  goldSilk: "1631663027473-3671aa7c4503",
+  goldSilk2: "1630961680574-158007a1fb73",
+  champagneSilk: "1630961680768-998a170045fa",
+  maroonDark: "1730144587897-ee8bc69013b2",
+  maroonDark2: "1730144615465-adedba32ae37",
+  maroonGarden: "1733737201354-91847ffbb736",
+  maroonPink: "1705164456205-69d775ce1482",
+  brocadeNoir: "1758278212585-c050f6ee5742",
+  brocadeRust: "1789882293195-d29f92e9730f",
+  goldMesh: "1616746110036-8af55bd5bd73",
+  goldWeave: "1616746109887-431ef6f9a402",
 };

@@ -1,34 +1,44 @@
 "use client";
 
-import { InstagramIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Heart, Menu, Search, ShoppingBag, X, ArrowUpRight, Phone } from "lucide-react";
+import { Search, ShoppingBag } from "lucide-react";
+import { InstagramIcon } from "@/components/ui/Icons";
 import Wordmark from "./Wordmark";
+import SoundToggle from "./SoundToggle";
 import Img from "@/components/ui/Img";
-import { CATEGORIES, COLLECTIONS, PRODUCTS } from "@/data/products";
+import { COLLECTIONS, STORY } from "@/data/products";
 import { SITE, whatsappLink } from "@/data/site";
 import { useStore } from "@/lib/store";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 
+const MENU = [
+  { label: "The Collection", href: "/shop", img: "1610189012906-4c0aa9b9781e" },
+  ...COLLECTIONS.map((c) => ({ label: c.name, href: `/collections/${c.slug}`, img: c.cover })),
+  { label: "Our Craft", href: "/our-story", img: STORY.loom },
+  { label: "Visit & Contact", href: "/contact", img: STORY.silkTeal },
+];
+
+/**
+ * Minimal editorial navigation: Menu · wordmark · sound / search / bag.
+ * The menu opens a full-screen emerald index with a live image preview.
+ */
 export default function Header() {
   const pathname = usePathname();
   const { cartCount, wishlist, setCartOpen, setSearchOpen } = useStore();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [mega, setMega] = useState(false);
-  const [drawer, setDrawer] = useState(false);
-  const [preview, setPreview] = useState(CATEGORIES[0].cover);
+  const [menu, setMenu] = useState(false);
+  const [preview, setPreview] = useState(MENU[0].img);
   const lastY = useRef(0);
-  const closeTimer = useRef<number>();
 
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 40);
-      setHidden(y > 300 && y > lastY.current + 4);
-      if (y < lastY.current - 4) setHidden(false);
+      if (y > 260 && y > lastY.current + 4) setHidden(true);
+      else if (y < lastY.current - 4 || y < 260) setHidden(false);
       lastY.current = y;
     };
     onScroll();
@@ -36,149 +46,81 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    setMega(false);
-    setDrawer(false);
-  }, [pathname]);
+  useEffect(() => { setMenu(false); }, [pathname]);
 
   useEffect(() => {
-    if (!drawer) return;
+    if (!menu) return;
     lockScroll();
-    return () => unlockScroll();
-  }, [drawer]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setMega(false); setDrawer(false); }
-    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenu(false);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+    return () => { unlockScroll(); window.removeEventListener("keydown", onKey); };
+  }, [menu]);
 
-  const overHero = pathname === "/" && !scrolled && !mega;
-  const openMega = () => { window.clearTimeout(closeTimer.current); setMega(true); };
-  const closeMega = () => { closeTimer.current = window.setTimeout(() => setMega(false), 160); };
-  const count = (slug: string) => PRODUCTS.filter((p) => p.category === slug).length;
+  // Over the dark cinematic home page the bar stays transparent; elsewhere it becomes ivory on scroll.
+  const dark = pathname === "/";
+  const t = menu ? 0 : -1;
 
   return (
     <>
       <a href="#main" className="skip-link">Skip to content</a>
-      <header
-        className={`site-header ${overHero ? "is-over-hero" : "is-solid"} ${hidden && !mega ? "is-hidden" : ""} ${mega ? "is-mega" : ""}`}
-        onMouseLeave={closeMega}
-      >
+      <header className={`site-header ${dark ? "is-dark" : "is-light"} ${scrolled ? "is-scrolled" : ""} ${hidden && !menu ? "is-hidden" : ""} ${menu ? "is-menu" : ""}`}>
         <div className="site-header__bar">
-          <nav className="site-header__nav" aria-label="Primary">
-            <button className="icon-btn only-mobile" aria-label="Open menu" onClick={() => setDrawer(true)}>
-              <Menu size={20} strokeWidth={1.4} />
+          <div className="site-header__left">
+            <button className="menu-btn" onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-controls="site-menu" data-cursor="hover">
+              <span className="menu-btn__lines" aria-hidden="true"><i /><i /></span>
+              <span className="menu-btn__label">{menu ? "Close" : "Menu"}</span>
             </button>
-            <button
-              className="nav-link only-desktop"
-              aria-expanded={mega}
-              aria-controls="mega-menu"
-              onMouseEnter={openMega}
-              onFocus={openMega}
-              onClick={() => setMega((m) => !m)}
-              data-cursor="hover"
-            >
-              Shop
-            </button>
-            <Link className="nav-link only-desktop" href="/collections/bridal" onMouseEnter={closeMega} data-cursor="hover">Bridal</Link>
-            <Link className="nav-link only-desktop" href="/collections/sarees" onMouseEnter={closeMega} data-cursor="hover">Sarees</Link>
-            <Link className="nav-link only-desktop" href="/our-story" onMouseEnter={closeMega} data-cursor="hover">Our Story</Link>
-          </nav>
+            <Link href="/shop" className="nav-link only-desktop" data-cursor="hover">Collection</Link>
+            <Link href="/collections/bridal" className="nav-link only-desktop" data-cursor="hover">Bridal</Link>
+          </div>
 
           <Wordmark />
 
           <div className="site-header__actions">
+            <SoundToggle className="only-desktop" />
             <button className="icon-btn" aria-label="Search (press /)" onClick={() => setSearchOpen(true)} data-cursor="hover">
-              <Search size={19} strokeWidth={1.4} />
+              <Search size={18} strokeWidth={1.3} />
             </button>
-            <Link className="icon-btn only-desktop" href="/wishlist" aria-label={`Wishlist (${wishlist.length})`} data-cursor="hover">
-              <Heart size={19} strokeWidth={1.4} />
-              {wishlist.length > 0 && <span className="icon-btn__badge">{wishlist.length}</span>}
-            </Link>
             <button className="icon-btn" aria-label={`Shopping bag (${cartCount} items)`} onClick={() => setCartOpen(true)} data-cursor="hover">
-              <ShoppingBag size={19} strokeWidth={1.4} />
+              <ShoppingBag size={18} strokeWidth={1.3} />
               {cartCount > 0 && <span className="icon-btn__badge">{cartCount}</span>}
             </button>
-            <Link className="nav-cta only-desktop" href="/contact" data-cursor="hover">Book a Visit</Link>
-          </div>
-        </div>
-
-        <div id="mega-menu" className="mega" onMouseEnter={openMega} aria-hidden={!mega}>
-          <div className="mega__inner">
-            <div className="mega__col">
-              <p className="eyebrow">Categories</p>
-              <ul className="mega__list">
-                {CATEGORIES.map((c) => (
-                  <li key={c.slug}>
-                    <Link href={`/shop?cat=${c.slug}`} onMouseEnter={() => setPreview(c.cover)} onFocus={() => setPreview(c.cover)} data-cursor="hover">
-                      <span>{c.name}</span>
-                      <sup>{count(c.slug) || "In store"}</sup>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="mega__col">
-              <p className="eyebrow">Collections</p>
-              <ul className="mega__list mega__list--serif">
-                {COLLECTIONS.map((c) => (
-                  <li key={c.slug}>
-                    <Link href={`/collections/${c.slug}`} onMouseEnter={() => setPreview(c.cover)} onFocus={() => setPreview(c.cover)} data-cursor="hover">
-                      {c.name}
-                    </Link>
-                  </li>
-                ))}
-                <li><Link href="/shop" data-cursor="hover">Shop All <ArrowUpRight size={16} /></Link></li>
-              </ul>
-            </div>
-            <div className="mega__preview">
-              {/* key forces a soft crossfade when the preview changes */}
-              <div key={preview} className="mega__preview-img">
-                <Img id={preview} alt="" ratio={1.3} sizes="320px" width={640} />
-              </div>
-              <p className="mega__note">Every piece can be reserved on WhatsApp and viewed at the boutique in Marthandam.</p>
-            </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile navigation drawer */}
-      <div className={`drawer-scrim ${drawer ? "is-open" : ""}`} onClick={() => setDrawer(false)} aria-hidden="true" />
-      <aside className={`nav-drawer ${drawer ? "is-open" : ""}`} aria-label="Menu" aria-hidden={!drawer} data-lenis-prevent>
-        <div className="nav-drawer__top">
-          <Wordmark />
-          <button className="icon-btn" onClick={() => setDrawer(false)} aria-label="Close menu" tabIndex={drawer ? 0 : -1}>
-            <X size={22} strokeWidth={1.3} />
-          </button>
+      <div id="site-menu" className={`menu ${menu ? "is-open" : ""}`} aria-hidden={!menu} role="dialog" aria-modal="true" aria-label="Site menu" data-lenis-prevent>
+        <div className="menu__inner">
+          <nav className="menu__links" aria-label="Primary">
+            {MENU.map((m, i) => (
+              <Link
+                key={m.href}
+                href={m.href}
+                tabIndex={t}
+                onMouseEnter={() => setPreview(m.img)}
+                onFocus={() => setPreview(m.img)}
+                style={{ transitionDelay: menu ? `${120 + i * 55}ms` : "0ms" }}
+                className={pathname === m.href ? "is-current" : ""}
+              >
+                <span className="menu__n">{String(i + 1).padStart(2, "0")}</span>
+                <span className="menu__t">{m.label}</span>
+              </Link>
+            ))}
+          </nav>
+          <div className="menu__preview only-desktop" aria-hidden="true">
+            <div key={preview} className="menu__preview-img">
+              <Img id={preview} alt="" ratio={1.3} width={800} sizes="30vw" />
+            </div>
+          </div>
+          <div className="menu__foot">
+            <Link href="/wishlist" tabIndex={t}>Wishlist{wishlist.length ? ` (${wishlist.length})` : ""}</Link>
+            <a href={`tel:${SITE.phoneE164}`} tabIndex={t}>{SITE.phoneDisplay}</a>
+            <a href={SITE.instagram} target="_blank" rel="noopener noreferrer" tabIndex={t}><InstagramIcon size={14} /> {SITE.instagramHandle}</a>
+            <a href={whatsappLink("Hello Shambhavi Silks! I'd like to know more about your collection.")} target="_blank" rel="noopener noreferrer" tabIndex={t}>WhatsApp</a>
+            <SoundToggle className="only-mobile" />
+          </div>
         </div>
-        <nav className="nav-drawer__links">
-          {[
-            ["Shop All", "/shop"],
-            ["Sarees", "/collections/sarees"],
-            ["Designer Lehengas", "/collections/lehengas"],
-            ["Bridal Couture", "/collections/bridal"],
-            ["Anarkali Gowns", "/collections/anarkali"],
-            ["Occasion Wear", "/collections/occasion"],
-            ["Our Story", "/our-story"],
-            ["Wishlist", "/wishlist"],
-            ["Contact", "/contact"],
-          ].map(([label, href], i) => (
-            <Link key={href} href={href} style={{ transitionDelay: drawer ? `${80 + i * 40}ms` : "0ms" }} tabIndex={drawer ? 0 : -1}>
-              {label}
-            </Link>
-          ))}
-        </nav>
-        <div className="nav-drawer__foot">
-          <a href={`tel:${SITE.phoneE164}`} tabIndex={drawer ? 0 : -1}><Phone size={15} /> {SITE.phoneDisplay}</a>
-          <a href={SITE.instagram} target="_blank" rel="noopener noreferrer" tabIndex={drawer ? 0 : -1}><InstagramIcon size={15} /> {SITE.instagramHandle}</a>
-          <a href={whatsappLink("Hello Shambhavi Silks! I'd like to know more about your collection.")} target="_blank" rel="noopener noreferrer" className="lux-btn lux-btn--light" tabIndex={drawer ? 0 : -1}>
-            <span className="lux-btn__label">Chat on WhatsApp</span>
-          </a>
-        </div>
-      </aside>
+      </div>
     </>
   );
 }

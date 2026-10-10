@@ -7,7 +7,7 @@ type Props = {
   href?: string;
   onClick?: () => void;
   children: React.ReactNode;
-  variant?: "solid" | "ghost" | "light";
+  variant?: "solid" | "ghost" | "light" | "rose";
   external?: boolean;
   className?: string;
   type?: "button" | "submit";

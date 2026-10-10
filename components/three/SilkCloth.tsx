@@ -9,6 +9,7 @@ import { SIMPLEX_NOISE, SILK_DISPLACEMENT } from "./glsl";
 export type SilkPalette = { base: string; sheen: string; gold: string };
 
 export const PALETTES: Record<string, SilkPalette> = {
+  heritage: { base: "#0e2a23", sheen: "#d6b779", gold: "#d6b779" },
   burgundy: { base: "#4a0c19", sheen: "#f0b98a", gold: "#c9a063" },
   champagne: { base: "#cdb48f", sheen: "#fff3dc", gold: "#a8793a" },
   emerald: { base: "#0b3a30", sheen: "#9fe0c4", gold: "#c9a063" },
@@ -51,12 +52,14 @@ type Props = {
   parallax?: number;
   /** fade zari motifs in as `progress` rises */
   revealPattern?: boolean;
+  /** 0..1 intro progress — drives the opening camera dolly */
+  intro?: React.MutableRefObject<number>;
 };
 
 const W = 9;
 const H = 6;
 
-export default function SilkCloth({ palette = PALETTES.burgundy, progress, pointer, detail = "high", pattern = 1, parallax = 0.35, revealPattern = false }: Props) {
+export default function SilkCloth({ palette = PALETTES.burgundy, progress, pointer, detail = "high", pattern = 1, parallax = 0.35, revealPattern = false, intro }: Props) {
   const mesh = useRef<THREE.Mesh>(null);
   const smoothMouse = useRef(new THREE.Vector2(0, 0));
   const hover = useRef(0);
@@ -199,20 +202,24 @@ export default function SilkCloth({ palette = PALETTES.burgundy, progress, point
     // Cinematic camera: pointer parallax + scroll-driven dolly.
     camera.position.x += (px * parallax - camera.position.x) * 0.04;
     camera.position.y += (py * parallax * 0.6 - camera.position.y) * 0.04;
-    camera.position.z += (4.2 - p * 1.4 - camera.position.z) * 0.06;
+    const it = intro?.current ?? 1;
+    camera.position.z += (4.2 - p * 1.5 + (1 - it) * 1.8 - camera.position.z) * 0.05;
     camera.lookAt(0, 0, 0);
 
     if (mesh.current) {
       mesh.current.rotation.z = 0.14 + Math.sin(state.clock.elapsedTime * 0.1) * 0.02 - p * 0.12;
+      mesh.current.rotation.x = -0.55 + (1 - it) * 0.25 + p * 0.2;
     }
   });
 
   return (
     <>
       <mesh ref={mesh} geometry={geometry} material={material} rotation={[-0.55, 0.05, 0.14]} position={[0, -0.1, 0]} />
-      <directionalLight position={[3, 4, 3]} intensity={1.6} color="#ffe7c7" />
-      <directionalLight position={[-4, -1, 2]} intensity={0.6} color="#d8a76a" />
-      <ambientLight intensity={0.15} />
+      {/* Cinematic key from upper-left (matches the volumetric rays), cool emerald fill, bronze rim */}
+      <directionalLight position={[-3.5, 4, 3]} intensity={2.4} color="#ffe1b0" />
+      <directionalLight position={[4, -1, 1.5]} intensity={0.35} color="#3f7d6a" />
+      <directionalLight position={[0, -3, -2]} intensity={0.6} color="#98734b" />
+      <ambientLight intensity={0.08} />
     </>
   );
 }

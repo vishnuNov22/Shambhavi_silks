@@ -2,24 +2,37 @@
    SHAMBHAVI — design tokens & foundations
    ========================================================= */
 :root {
-  --ink: #0d0b0a;
-  --ink-2: #171311;
-  --ink-3: #241d1a;
-  --ivory: #f5efe4;
-  --ivory-2: #ece3d3;
-  --paper: #faf6ef;
-  --burgundy: #4e0d1a;
-  --burgundy-2: #6d1527;
-  --wine: #2a060d;
-  --emerald: #0d3a31;
-  --emerald-2: #12503f;
-  --gold: #b8935a;
+  /* v3 palette (client reference video): wine, noir, rose-gold silk, champagne gold, ivory, petal */
+  --wine: #3a0f17;
+  --wine-2: #561a25;
+  --noir: #0f0b0c;
+  --charcoal: #18141a;
+  --rosegold: #c98f78;
+  --rosegold-2: #ebbfa6;
+  --petal: #efc3c0;
+
+  --ink: #160e10;
+  --ink-2: #211618;
+  --ink-3: #2c1e21;
+  --ivory: #f4ece2;
+  --ivory-2: #eadfd1;
+  --paper: #f7f1e8;
+  --champagne-gold: #d9b77c;
+  --champagne: #ead6b2;
+  --bronze: #a8705a;
+  --rose: #c98f78;
+  /* legacy aliases used across components */
+  --forest: #0f0b0c;
+  --emerald: #3a0f17;
+  --emerald-2: #561a25;
+  --burgundy: #3a0f17;
+  --burgundy-2: #c98f78;
+  --gold: #a8705a;
   --gold-2: #d9b77c;
-  --champagne: #e9d8bb;
-  --saffron: #e2762b; /* from the Shambhavi signboard */
-  --muted: #7d7166;
-  --line: rgba(13, 11, 10, 0.14);
-  --line-light: rgba(245, 239, 228, 0.18);
+  --saffron: #c98f78;
+  --muted: #7b6c69;
+  --line: rgba(22, 14, 16, 0.13);
+  --line-light: rgba(244, 236, 226, 0.15);
 
   /* next/font injects --font-serif / --font-sans / --font-display on <html> */
   --serif: var(--font-serif, "Cormorant Garamond"), Georgia, serif;
@@ -165,6 +178,8 @@ h2 em, h1 em { font-weight: 300; }
 .lux-btn--solid .lux-btn__fill { background: var(--burgundy-2); }
 .lux-btn--light { background: var(--ivory); color: var(--ink); }
 .lux-btn--light .lux-btn__fill { background: var(--gold-2); }
+.lux-btn--rose { background: var(--rosegold); color: var(--noir); }
+.lux-btn--rose .lux-btn__fill { background: var(--ivory); }
 .lux-btn--ghost { border: 1px solid rgba(245,239,228,.45); color: var(--ivory); }
 .lux-btn--ghost .lux-btn__fill { background: var(--ivory); }
 .lux-btn--ghost:hover { color: var(--ink); }
@@ -181,7 +196,7 @@ h2 em, h1 em { font-weight: 300; }
 .icon-btn:hover { background: rgba(127,127,127,.12); }
 .icon-btn__badge {
   position: absolute; top: 4px; right: 2px; min-width: 17px; height: 17px; border-radius: 9px; padding: 0 4px;
-  background: var(--saffron); color: #fff; font-size: 9.5px; font-weight: 700; display: grid; place-items: center;
+  background: var(--champagne-gold); color: var(--forest); font-size: 9.5px; font-weight: 700; display: grid; place-items: center;
 }
 .icon-btn--ring { border: 1px solid var(--line); width: 54px; height: 54px; flex: none; }
 .icon-btn.is-wished svg, .card__wish.is-wished svg { fill: var(--burgundy-2); stroke: var(--burgundy-2); }
@@ -206,9 +221,9 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
 .cursor-dot, .cursor-ring {
   position: fixed; top: 0; left: 0; z-index: 10000; pointer-events: none; border-radius: 50%;
 }
-.cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--saffron); mix-blend-mode: normal; }
+.cursor-dot { width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; background: var(--champagne-gold); mix-blend-mode: difference; }
 .cursor-ring {
-  width: 38px; height: 38px; margin: -19px 0 0 -19px; border: 1px solid rgba(184, 147, 90, .8);
+  width: 38px; height: 38px; margin: -19px 0 0 -19px; border: 1px solid rgba(214, 183, 121, .55);
   display: grid; place-items: center;
   transition: width .5s var(--ease-silk), height .5s var(--ease-silk), margin .5s var(--ease-silk), background .4s, border-color .4s;
 }
@@ -216,25 +231,19 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
   font-size: 10px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; color: var(--ink);
   opacity: 0; transition: opacity .3s;
 }
-.cursor-ring[data-state="hover"] { width: 64px; height: 64px; margin: -32px 0 0 -32px; background: rgba(184,147,90,.12); }
-.cursor-ring[data-state="label"] { width: 92px; height: 92px; margin: -46px 0 0 -46px; background: var(--champagne); border-color: transparent; }
+.cursor-ring[data-state="hover"] { width: 56px; height: 56px; margin: -28px 0 0 -28px; background: rgba(214,183,121,.10); }
+.cursor-ring[data-state="label"] { width: 86px; height: 86px; margin: -43px 0 0 -43px; background: var(--ivory); border-color: transparent; }
 .cursor-ring[data-state="label"] span { opacity: 1; }
 .cursor-ring.is-down { transform: scale(.85); }
 
-/* ---------- route curtain (CSS-only) ---------- */
-.route-curtain {
-  position: fixed; inset: 0; z-index: 900; background: var(--burgundy); display: grid; place-items: center;
-  animation: curtain-up 1.05s var(--ease-drape) .1s forwards; pointer-events: none;
-  background-image: radial-gradient(120% 80% at 50% 120%, rgba(217,183,124,.25), transparent 60%);
-}
-.route-curtain__word {
-  font-family: var(--disp); font-size: clamp(36px, 7vw, 96px); color: var(--champagne); letter-spacing: .08em;
-  animation: curtain-word .9s var(--ease-silk) both;
-}
-.route-content { animation: content-in .9s var(--ease-silk) .45s both; }
-@keyframes curtain-up { to { transform: translateY(-100%); visibility: hidden; } }
-@keyframes curtain-word { from { opacity: 0; letter-spacing: .3em; } to { opacity: 1; letter-spacing: .08em; } }
+/* ---------- route transition (clean fade; card → product uses View Transitions) ---------- */
+.route-content { animation: content-in .7s var(--ease-silk) both; }
+html.vt-nav .route-content { animation: none; }
 @keyframes content-in { from { opacity: 0; } to { opacity: 1; } }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .45s; }
+::view-transition-group(pdp-hero) { animation-duration: .9s; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+::view-transition-image-pair(pdp-hero) { isolation: auto; }
+::view-transition-old(pdp-hero), ::view-transition-new(pdp-hero) { animation: none; mix-blend-mode: normal; height: 100%; object-fit: cover; overflow: clip; }
 
 /* ---------- toast / loading ---------- */
 .toast {
@@ -256,7 +265,6 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-  .route-curtain { display: none; }
   .route-content { animation: none; }
   .marquee__track { animation: none; }
 }
