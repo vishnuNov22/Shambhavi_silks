@@ -135,7 +135,7 @@ export default function Petals() {
   if (mode === "off") return null;
   return (
     <div className="petals" aria-hidden="true">
-      <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 50 }} gl={{ antialias: true, alpha: true }}>
+      <Canvas style={{ pointerEvents: "none" }} dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 50 }} gl={{ antialias: true, alpha: true }}>
         <Field count={mode === "low" ? 14 : 32} />
       </Canvas>
     </div>

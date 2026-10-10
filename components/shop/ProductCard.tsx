@@ -1,33 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useRef } from "react";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import Img from "@/components/ui/Img";
 import { getCategory, type Product } from "@/data/products";
 import { formatINR } from "@/data/site";
 import { useStore } from "@/lib/store";
 
-type VTDocument = Document & { startViewTransition?: (cb: () => Promise<void> | void) => { finished: Promise<void> } };
-
-/** Resolve once the destination product page has rendered its hero image. */
-function waitFor(selector: string, timeout = 2000) {
-  return new Promise<void>((resolve) => {
-    const start = performance.now();
-    const tick = () => {
-      if (document.querySelector(selector) || performance.now() - start > timeout) resolve();
-      else requestAnimationFrame(tick);
-    };
-    tick();
-  });
-}
-
 /**
- * Couture-catalogue card: large photograph, no box, fine champagne rule.
- * Hover: slow zoom, soft light follows the pointer, the photograph cross-fades
- * to its border detail, and fabric/colour details slide up. Clicking carries
- * the photograph into the product page (View Transitions API, where supported).
+ * Couture-catalogue card.
+ * - The photograph and the name are plain links to the product page
+ *   (normal, reliable navigation — no intercepted clicks).
+ * - "Add to Bag" sits under the details as a clear action; pieces with a
+ *   blouse/size choice are added with the default option (changeable in the bag
+ *   or on the product page).
+ * - Hover (desktop): slow zoom, pointer-following light, cross-fade to the
+ *   border detail and a champagne rule drawing under the name.
  */
 export default function ProductCard({
   p,
@@ -42,10 +31,8 @@ export default function ProductCard({
   size?: "md" | "lg";
   tone?: "light" | "dark";
 }) {
-  const { toggleWish, isWished, setQuickView } = useStore();
-  const router = useRouter();
+  const { toggleWish, isWished, addToCart, setCartOpen } = useStore();
   const frame = useRef<HTMLDivElement>(null);
-  const media = useRef<HTMLAnchorElement>(null);
   const wished = isWished(p.id);
   const href = `/product/${p.slug}`;
   const ratio = size === "lg" ? 1.25 : 1.33;
@@ -65,26 +52,15 @@ export default function ProductCard({
     frame.current?.style.setProperty("--ry", "0deg");
   };
 
-  const open = (e: React.MouseEvent) => {
-    const doc = document as VTDocument;
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0 || !doc.startViewTransition || !media.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    e.preventDefault();
-    document.querySelectorAll<HTMLElement>("[data-vt-hero]").forEach((el) => el.style.setProperty("view-transition-name", "none"));
-    media.current.style.setProperty("view-transition-name", "pdp-hero");
-    document.documentElement.classList.add("vt-nav");
-    const t = doc.startViewTransition(async () => {
-      media.current?.style.removeProperty("view-transition-name");
-      router.push(href);
-      await waitFor(`[data-vt-slug="${p.slug}"]`);
-    });
-    t.finished.finally(() => document.documentElement.classList.remove("vt-nav"));
+  const add = () => {
+    addToCart(p, p.options?.values[0], 1);
+    setCartOpen(true);
   };
 
   return (
     <article className={`card card--${size} card--${tone}`} style={{ "--i": index % 8 } as React.CSSProperties}>
       <div className="card__frame" ref={frame} onPointerMove={light} onPointerLeave={reset}>
-        <Link ref={media} href={href} onClick={open} className="card__media" data-cursor-label="View" aria-label={`${p.name}, ${formatINR(p.price)}`}>
+        <Link href={href} className="card__media" data-cursor-label="View" aria-label={`${p.name}, ${formatINR(p.price)}`}>
           <Img id={p.images[0]} alt={p.name} ratio={ratio} sizes={size === "lg" ? "(max-width: 820px) 100vw, 50vw" : "(max-width: 600px) 50vw, (max-width: 1100px) 33vw, 25vw"} width={size === "lg" ? 1400 : 900} priority={priority} className="card__img" />
           {p.images[1] && <Img id={p.images[1]} alt="" ratio={ratio} sizes="(max-width: 600px) 50vw, 25vw" width={900} className="card__img card__img--alt" />}
           <span className="card__light" aria-hidden="true" />
@@ -93,17 +69,22 @@ export default function ProductCard({
         <button className={`card__wish ${wished ? "is-wished" : ""}`} onClick={() => toggleWish(p.id)} aria-label={wished ? `Remove ${p.name} from wishlist` : `Save ${p.name} to wishlist`} aria-pressed={wished}>
           <Heart size={15} strokeWidth={1.3} />
         </button>
-        <button className="card__quick" onClick={() => setQuickView(p)} aria-label={`Quick view ${p.name}`}>Quick view</button>
       </div>
       <div className="card__info">
         <div className="card__top">
-          <h3 className="card__name"><Link href={href} onClick={open}>{p.name}</Link></h3>
+          <h3 className="card__name"><Link href={href}>{p.name}</Link></h3>
           <p className="card__price">{formatINR(p.price)}</p>
         </div>
         <span className="card__rule" aria-hidden="true" />
         <div className="card__more">
           <p className="card__cat">{getCategory(p.category)?.short} · {p.fabric}</p>
           <p className="card__color"><span className="swatch swatch--sm" style={{ background: p.colorHex }} /> {p.color}</p>
+        </div>
+        <div className="card__actions">
+          <button type="button" className="card__add" onClick={add} aria-label={`Add ${p.name} to bag`}>
+            <ShoppingBag size={14} strokeWidth={1.4} /> <span>Add to Bag</span>
+          </button>
+          <Link href={href} className="card__view">View details</Link>
         </div>
       </div>
     </article>

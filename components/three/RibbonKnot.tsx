@@ -155,6 +155,7 @@ export default function RibbonKnot({ phase, className }: { phase: React.MutableR
   return (
     <div ref={wrap} className={className} aria-hidden="true">
       <Canvas
+        style={{ pointerEvents: "none" }}
         frameloop={inView ? "always" : "never"}
         dpr={mobile ? [1, 1.5] : [1, 1.75]}
         camera={{ position: [0, 0, 6], fov: 40 }}

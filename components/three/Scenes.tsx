@@ -18,6 +18,7 @@ function Shell({ children, className, fov = 38, z = 6 }: { children: React.React
   return (
     <div ref={wrap} className={className} aria-hidden="true">
       <Canvas
+        style={{ pointerEvents: "none" }}
         frameloop={inView ? "always" : "never"}
         dpr={mobile ? [1, 1.5] : [1, 1.75]}
         camera={{ position: [0, 0, z], fov }}
